@@ -1,14 +1,21 @@
 ﻿@inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 
-<AuthorizeView>
-    <Authorized>
-        @Body
-    </Authorized>
-    <NotAuthorized>
-        <p>You are not authorized to view this page. Please <a href="/login">login</a>.</p>
-    </NotAuthorized>
-</AuthorizeView>
+@if (!NavigationManager.Uri.EndsWith("/login"))
+{
+    <AuthorizeView>
+        <Authorized>
+            @Body
+        </Authorized>
+        <NotAuthorized>
+            <p>You are not authorized to view this page. Please <a href="/login">login</a>.</p>
+        </NotAuthorized>
+    </AuthorizeView>
+}
+else
+{
+    @Body
+}
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
