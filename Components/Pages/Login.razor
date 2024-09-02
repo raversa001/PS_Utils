@@ -26,6 +26,8 @@
     {
         // Call the authentication service to validate the user
         // and obtain a JWT token
+        // If successful, redirect to the home page or another protected page
+        NavigationManager.NavigateTo("/");
     }
 
     public class LoginModel
