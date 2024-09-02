@@ -23,6 +23,9 @@
 @code {
     private LoginModel loginModel = new LoginModel();
 
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
     private async Task HandleLogin()
     {
         // Call the authentication service to validate the user
