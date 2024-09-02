@@ -26,7 +26,7 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; }
 
-    private async Task HandleLogin()
+    private void HandleLogin()
     {
         // Call the authentication service to validate the user
         // and obtain a JWT token
