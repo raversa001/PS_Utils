@@ -1,7 +1,32 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@code {
+    private bool IsAuthenticated { get; set; }
 
-<PageTitle>Home</PageTitle>
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if a JWT token exists in local storage
+        var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+        if (string.IsNullOrEmpty(token))
+        {
+            // Redirect to login page if no token is found
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            // You may want to validate the token here (with an API call, for example)
+            IsAuthenticated = true;
+        }
+    }
+}
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+@if (IsAuthenticated)
+{
+    <h3>Welcome to the secured home page!</h3>
+}
+else
+{
+    <p>Redirecting to login...</p>
+}

@@ -1,45 +1,43 @@
 @page "/login"
-@using System.ComponentModel.DataAnnotations
-
-<PageTitle>Login</PageTitle>
-
-<h3>Login</h3>
-
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div>
-        <label for="username">Username:</label>
-        <InputText id="username" @bind-Value="loginModel.Username" />
-    </div>
-    <div>
-        <label for="password">Password:</label>
-        <InputText id="password" type="password" @bind-Value="loginModel.Password" />
-    </div>
-    <button type="submit">Login</button>
-</EditForm>
-
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
 @code {
-    private LoginModel loginModel = new LoginModel();
+    private string Username { get; set; }
+    private string Password { get; set; }
+    private string Domain { get; set; }
+    private string ErrorMessage { get; set; }
 
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    private void HandleLogin()
+    private async Task HandleLogin()
     {
-        // Call the authentication service to validate the user
-        // and obtain a JWT token
-        // If successful, redirect to the home page or another protected page
-        NavigationManager.NavigateTo("/");
-    }
+        ErrorMessage = null;
+        try
+        {
+            // Call the authentication service to get JWT token
+            var auth = new AuthService();
+            var token = await auth.LoginAsync(Domain, Username, Password);
 
-    public class LoginModel
-    {
-        [Required]
-        public string? Username { get; set; }
+            // Store the token in local storage
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
 
-        [Required]
-        public string? Password { get; set; }
+            // Redirect to home page after successful login
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
     }
 }
+
+<div class="login-form">
+    <h3>Login</h3>
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+    <input placeholder="Domain" @bind="Domain" />
+    <input placeholder="Username" @bind="Username" />
+    <input type="password" placeholder="Password" @bind="Password" />
+    <button @onclick="HandleLogin">Login</button>
+</div>
